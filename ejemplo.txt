@@ -1,8 +1,6 @@
-int do_math(int a){
-  int x = a * 5
-  regresa x + 3
-}
+ 
+ variable a = 10 : int
+ 		b = 12 : int
 
-echo(do_math(11))
-echo(do_math(12))
-echo(34)
+ echo(a)
+ echo(b)

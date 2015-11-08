@@ -6,7 +6,10 @@
 	NBlock *programBlock; /* the top level root node of our final AST */
 
 	extern int yylex();
-	void yyerror(const char *s) { std::printf("Error: %s\n", s);std::exit(1); }
+	extern int line;
+	extern char* yytext;
+	extern bool debug;
+	void yyerror(const char *s) { std::printf("Error: %s\n no esperaba %s\n", s, yytext);std::exit(1); }
 %}
 
 /* Represents the many different ways we can access our data */
@@ -17,6 +20,7 @@
 	NStatement *stmt;
 	NIdentifier *ident;
 	NVariableDeclaration *var_decl;
+	NVariableDeclaration *var_decl_f;
 	std::vector<NVariableDeclaration*> *varvec;
 	std::vector<NExpression*> *exprvec;
 	std::string *string;
@@ -30,10 +34,10 @@
 %token <string> TIDENTIFIER TINTEGER TDOUBLE 
 
 
-%token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
+%token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL 
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
 %token <token> TPLUS TMINUS TMUL TDIV
-%token <token> TRETURN TEXTERN
+%token <token> TRETURN TEXTERN TVAR TDOSPUNTOS
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -63,7 +67,8 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
 	  | stmts stmt { $1->statements.push_back($<stmt>2); }
 	  ;
 
-stmt : var_decl | func_decl | extern_decl
+stmt : TVAR var_decl {$$ = $2;}
+	 | var_decl | func_decl | extern_decl
 	 | expr { $$ = new NExpressionStatement(*$1); }
 	 | TRETURN expr { $$ = new NReturnStatement(*$2); }
      ;
@@ -72,8 +77,9 @@ block : TLBRACE stmts TRBRACE { $$ = $2; }
 	  | TLBRACE TRBRACE { $$ = new NBlock(); }
 	  ;
 
-var_decl : ident ident { $$ = new NVariableDeclaration(*$1, *$2); }
-		 | ident ident TEQUAL expr { $$ = new NVariableDeclaration(*$1, *$2, $4); }
+
+var_decl :  ident TDOSPUNTOS ident { $$ = new NVariableDeclaration(*$3, *$1); }
+		 |   ident TEQUAL expr TDOSPUNTOS ident { $$ = new NVariableDeclaration(*$5, *$1, $3); }
 		 ;
 
 
@@ -90,8 +96,11 @@ func_decl_args : /*blank*/  { $$ = new VariableList(); }
 		  | func_decl_args TCOMMA var_decl { $1->push_back($<var_decl>3); }
 		  ;
 
-ident : TIDENTIFIER { $$ = new NIdentifier(*$1); delete $1; }
-	  
+ident : TIDENTIFIER { 
+						if(debug)
+							printf("-->Si es var estas muerto %s\n", yytext); 
+						$$ = new NIdentifier(*$1); delete $1; 
+					}
 	  ;
 
 numeric : TINTEGER { $$ = new NInteger(atol($1->c_str())); delete $1; }

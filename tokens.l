@@ -7,6 +7,7 @@
 
 #define SAVE_TOKEN  yylval.string = new std::string(yytext, yyleng)
 #define TOKEN(t)    (yylval.token = t)
+	bool debug = 1;
 	int line = 1;
 	int col = 0;
 %}
@@ -21,16 +22,30 @@
 								}
 "inclulle"                      return TOKEN(TEXTERN);
 "regresa"				        return TOKEN(TRETURN);
+"variable"						{
+									if (debug)
+										printf("-->Enconte la var \n"); 
+									
+									return TOKEN(TVAR);
+								}
+":"                             {
+									if (debug)
+										printf("-->Enconte los : \n");
+
+									return TOKEN(TDOSPUNTOS);
+								}
 
 [a-zA-Z_][a-zA-Z0-9_]* 			{
 									SAVE_TOKEN; 
 									return TIDENTIFIER;
 								}
 
+								
+
 [0-9]+\.[0-9]* 			    	SAVE_TOKEN; return TDOUBLE;
 [0-9]+					        SAVE_TOKEN; return TINTEGER;
 
-
+":"								{return TOKEN(TDOSPUNTOS);}
 "="						        return TOKEN(TEQUAL);
 "=="				          	return TOKEN(TCEQ);
 "!="			          		return TOKEN(TCNE);
