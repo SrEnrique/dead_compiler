@@ -1,6 +1,10 @@
  
  variable a = 10 : int
- 		b = 12 : int
+ 		  b = 12 : int
+
+
+
 
  echo(a)
  echo(b)
+ 

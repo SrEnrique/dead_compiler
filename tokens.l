@@ -34,6 +34,13 @@
 
 									return TOKEN(TDOSPUNTOS);
 								}
+"imprime" 						{
+									return TOKEN(TPRINT);				
+								}
+
+\".*\"                  	 	{//"
+									return TOKEN(TSTR); 
+								}
 
 [a-zA-Z_][a-zA-Z0-9_]* 			{
 									SAVE_TOKEN; 

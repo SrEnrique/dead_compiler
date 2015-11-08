@@ -31,13 +31,13 @@
    match our tokens.l flex file. We also define the node type
    they represent.
  */
-%token <string> TIDENTIFIER TINTEGER TDOUBLE 
+%token <string> TIDENTIFIER TINTEGER TDOUBLE TSTR
 
 
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL 
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
 %token <token> TPLUS TMINUS TMUL TDIV
-%token <token> TRETURN TEXTERN TVAR TDOSPUNTOS
+%token <token> TRETURN TEXTERN TVAR TDOSPUNTOS TPRINT
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -50,7 +50,7 @@
 %type <exprvec> call_args
 %type <block> program stmts block
 %type <stmt> stmt var_decl func_decl extern_decl
-%type <token> comparison
+%type <token> comparison imprime
 
 /* Operator precedence for mathematical operators */
 %left TPLUS TMINUS
@@ -61,6 +61,7 @@
 %%
 
 program : stmts { programBlock = $1; }
+
 		;
 		
 stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
@@ -79,7 +80,8 @@ block : TLBRACE stmts TRBRACE { $$ = $2; }
 
 
 var_decl :  ident TDOSPUNTOS ident { $$ = new NVariableDeclaration(*$3, *$1); }
-		 |   ident TEQUAL expr TDOSPUNTOS ident { $$ = new NVariableDeclaration(*$5, *$1, $3); }
+		 |  ident TEQUAL expr TDOSPUNTOS ident { $$ = new NVariableDeclaration(*$5, *$1, $3); }
+
 		 ;
 
 
@@ -111,10 +113,10 @@ expr : ident TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
 	 | ident TLPAREN call_args TRPAREN { $$ = new NMethodCall(*$1, *$3); delete $3; }
 	 | ident { $<ident>$ = $1; }
 	 | numeric
-         | expr TMUL expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
-         | expr TDIV expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
-         | expr TPLUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
-         | expr TMINUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+     | expr TMUL expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+     | expr TDIV expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+     | expr TPLUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+     | expr TMINUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
  	 | expr comparison expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
      | TLPAREN expr TRPAREN { $$ = $2; }
 	 ;
@@ -123,6 +125,7 @@ call_args : /*blank*/  { $$ = new ExpressionList(); }
 		  | expr { $$ = new ExpressionList(); $$->push_back($1); }
 		  | call_args TCOMMA expr  { $1->push_back($3); }
 		  ;
+
 
 comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE;
 

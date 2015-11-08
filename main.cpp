@@ -13,7 +13,6 @@ int main(int argc, char **argv)
 {
 	yyparse();
 	cout << programBlock << endl;
-    // see http://comments.gmane.org/gmane.comp.compilers.llvm.devel/33877
 	InitializeNativeTarget();
 	CodeGenContext context;
 	createCoreFunctions(context);
