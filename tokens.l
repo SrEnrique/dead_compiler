@@ -28,15 +28,26 @@
 									
 									return TOKEN(TVAR);
 								}
+"funcion"						{
+									if (debug)
+										printf("-->Enconte la var \n"); 
+									
+									return TOKEN(TFUN);
+								}
+
+
 ":"                             {
 									if (debug)
 										printf("-->Enconte los : \n");
 
 									return TOKEN(TDOSPUNTOS);
 								}
+
 "imprime" 						{
 									return TOKEN(TPRINT);				
 								}
+"inicio"         					return TOKEN(TLBRACE);
+"fin"					          	return TOKEN(TRBRACE);
 
 \".*\"                  	 	{//"
 									return TOKEN(TSTR); 
@@ -63,8 +74,7 @@
 
 "("	          					return TOKEN(TLPAREN);
 ")"					          	return TOKEN(TRPAREN);
-"{"         					return TOKEN(TLBRACE);
-"}"					          	return TOKEN(TRBRACE);
+
 
 "."         					return TOKEN(TDOT);
 ","				          		return TOKEN(TCOMMA);

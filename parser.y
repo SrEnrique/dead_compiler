@@ -37,7 +37,7 @@
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL 
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
 %token <token> TPLUS TMINUS TMUL TDIV
-%token <token> TRETURN TEXTERN TVAR TDOSPUNTOS TPRINT
+%token <token> TRETURN TEXTERN TVAR TDOSPUNTOS TPRINT TFUN
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -69,6 +69,7 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
 	  ;
 
 stmt : TVAR var_decl {$$ = $2;}
+	 | TFUN func_decl {$$ = $2;}
 	 | var_decl | func_decl | extern_decl
 	 | expr { $$ = new NExpressionStatement(*$1); }
 	 | TRETURN expr { $$ = new NReturnStatement(*$2); }
@@ -89,9 +90,15 @@ extern_decl : TEXTERN ident ident TLPAREN func_decl_args TRPAREN
                 { $$ = new NExternDeclaration(*$2, *$3, *$5); delete $5; }
             ;
 
-func_decl : ident ident TLPAREN func_decl_args TRPAREN block 
-			{ $$ = new NFunctionDeclaration(*$1, *$2, *$4, *$6); delete $4; }
+func_decl :  ident TLPAREN func_decl_args TRPAREN TDOSPUNTOS ident block 
+			{
+				//Funcion declaracion :D 
+
+				//me tipo, nombre, args, block instru y delete bloc
+				$$ = new NFunctionDeclaration(*$6, *$1, *$3, *$7); delete $3; 
+			}
 		  ;
+
 	
 func_decl_args : /*blank*/  { $$ = new VariableList(); }
 		  | var_decl { $$ = new VariableList(); $$->push_back($<var_decl>1); }
