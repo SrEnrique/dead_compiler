@@ -43,5 +43,23 @@ Nos dirigimos a la carpeta del proyecto y hacemos
 make 
 ```
 
+###Ejemplo 
+```
+variable a = 10 : int
+ 		  b = 12 : int
+
+funcion func() : int 
+inicio
+	variable x = 14 : int
+	regresa x 
+fin
+
+
+ echo(a)
+ echo(b)
+ variable c : int
+ c = func()
+ echo(c)
+```
 
 
