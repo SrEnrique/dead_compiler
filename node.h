@@ -37,7 +37,7 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class NIdentifier : public NExpression {
+class NIdentifier : public NExpression{
 public:
 	std::string name;
 	NIdentifier(const std::string& name) : name(name) { }

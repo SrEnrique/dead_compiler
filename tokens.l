@@ -1,22 +1,35 @@
 %{
 #include <string>
+#include <iostream>
+#include <cstring>
 #include "node.h"
 #include "parser.hpp"
 
 #define SAVE_TOKEN  yylval.string = new std::string(yytext, yyleng)
 #define TOKEN(t)    (yylval.token = t)
+	int line = 1;
+	int col = 0;
 %}
 
 %option noyywrap
 
 %%
 
-[ \t\n]					        ;
-"funcion"                        return TOKEN(TEXTERN);
-"return"				        return TOKEN(TRETURN);
-[a-zA-Z_][a-zA-Z0-9_]* 			SAVE_TOKEN; return TIDENTIFIER;
+[ \t]					        {col++;}
+[\n]							{line++;
+									col = 0;
+								}
+"inclulle"                      return TOKEN(TEXTERN);
+"regresa"				        return TOKEN(TRETURN);
+
+[a-zA-Z_][a-zA-Z0-9_]* 			{
+									SAVE_TOKEN; 
+									return TIDENTIFIER;
+								}
+
 [0-9]+\.[0-9]* 			    	SAVE_TOKEN; return TDOUBLE;
 [0-9]+					        SAVE_TOKEN; return TINTEGER;
+
 
 "="						        return TOKEN(TEQUAL);
 "=="				          	return TOKEN(TCEQ);
@@ -39,6 +52,6 @@
 "*"		          				return TOKEN(TMUL);
 "/"				          		return TOKEN(TDIV);
 
-.                       printf("error token\n"); yyterminate();
+.                       printf("error token en la linea %i: %i\n", line, col); yyterminate();
 
 %%

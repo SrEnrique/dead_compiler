@@ -1,7 +1,8 @@
 %{
 	#include "node.h"
-        #include <cstdio>
-        #include <cstdlib>
+    #include <cstdio>
+    #include <cstdlib>
+    using namespace std;
 	NBlock *programBlock; /* the top level root node of our final AST */
 
 	extern int yylex();
@@ -23,10 +24,12 @@
 }
 
 /* Define our terminal symbols (tokens). This should
-   match our tokens.l lex file. We also define the node type
+   match our tokens.l flex file. We also define the node type
    they represent.
  */
-%token <string> TIDENTIFIER TINTEGER TDOUBLE
+%token <string> TIDENTIFIER TINTEGER TDOUBLE 
+
+
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
 %token <token> TPLUS TMINUS TMUL TDIV
@@ -37,7 +40,7 @@
    we call an ident (defined by union type ident) we are really
    calling an (NIdentifier*). It makes the compiler happy.
  */
-%type <ident> ident
+%type <ident> ident 
 %type <expr> numeric expr 
 %type <varvec> func_decl_args
 %type <exprvec> call_args
@@ -73,6 +76,7 @@ var_decl : ident ident { $$ = new NVariableDeclaration(*$1, *$2); }
 		 | ident ident TEQUAL expr { $$ = new NVariableDeclaration(*$1, *$2, $4); }
 		 ;
 
+
 extern_decl : TEXTERN ident ident TLPAREN func_decl_args TRPAREN
                 { $$ = new NExternDeclaration(*$2, *$3, *$5); delete $5; }
             ;
@@ -87,6 +91,7 @@ func_decl_args : /*blank*/  { $$ = new VariableList(); }
 		  ;
 
 ident : TIDENTIFIER { $$ = new NIdentifier(*$1); delete $1; }
+	  
 	  ;
 
 numeric : TINTEGER { $$ = new NInteger(atol($1->c_str())); delete $1; }
