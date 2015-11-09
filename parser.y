@@ -9,7 +9,7 @@
 	extern int line;
 	extern char* yytext;
 	extern bool debug;
-	void yyerror(const char *s) { std::printf("Error: %s\n no esperaba %s\n", s, yytext);std::exit(1); }
+	void yyerror(const char *s) { std::printf("Error: %s\nLinea: %i\nno esperaba %s\n", s, line ,yytext);std::exit(1); }
 %}
 
 /* Represents the many different ways we can access our data */
@@ -34,10 +34,10 @@
 %token <string> TIDENTIFIER TINTEGER TDOUBLE TSTR
 
 
-%token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL 
+%token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL  
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
 %token <token> TPLUS TMINUS TMUL TDIV
-%token <token> TRETURN TEXTERN TVAR TDOSPUNTOS TPRINT TFUN
+%token <token> TRETURN TEXTERN TVAR TDOSPUNTOS TPRINT TFUN  TIF 
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -45,12 +45,12 @@
    calling an (NIdentifier*). It makes the compiler happy.
  */
 %type <ident> ident 
-%type <expr> numeric expr 
+%type <expr> numeric expr  printf
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> program stmts block
 %type <stmt> stmt var_decl func_decl extern_decl
-%type <token> comparison imprime
+%type <token> comparison 
 
 /* Operator precedence for mathematical operators */
 %left TPLUS TMINUS
@@ -82,7 +82,6 @@ block : TLBRACE stmts TRBRACE { $$ = $2; }
 
 var_decl :  ident TDOSPUNTOS ident { $$ = new NVariableDeclaration(*$3, *$1); }
 		 |  ident TEQUAL expr TDOSPUNTOS ident { $$ = new NVariableDeclaration(*$5, *$1, $3); }
-
 		 ;
 
 
@@ -93,7 +92,6 @@ extern_decl : TEXTERN ident ident TLPAREN func_decl_args TRPAREN
 func_decl :  ident TLPAREN func_decl_args TRPAREN TDOSPUNTOS ident block 
 			{
 				//Funcion declaracion :D 
-
 				//me tipo, nombre, args, block instru y delete bloc
 				$$ = new NFunctionDeclaration(*$6, *$1, *$3, *$7); delete $3; 
 			}
@@ -106,8 +104,7 @@ func_decl_args : /*blank*/  { $$ = new VariableList(); }
 		  ;
 
 ident : TIDENTIFIER { 
-						if(debug)
-							printf("-->Si es var estas muerto %s\n", yytext); 
+						
 						$$ = new NIdentifier(*$1); delete $1; 
 					}
 	  ;
@@ -115,11 +112,16 @@ ident : TIDENTIFIER {
 numeric : TINTEGER { $$ = new NInteger(atol($1->c_str())); delete $1; }
 		| TDOUBLE { $$ = new NDouble(atof($1->c_str())); delete $1; }
 		;
-	
+
+
+
+
+
 expr : ident TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
 	 | ident TLPAREN call_args TRPAREN { $$ = new NMethodCall(*$1, *$3); delete $3; }
 	 | ident { $<ident>$ = $1; }
 	 | numeric
+	 
      | expr TMUL expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
      | expr TDIV expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
      | expr TPLUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }

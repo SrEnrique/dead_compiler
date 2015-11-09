@@ -1,4 +1,4 @@
-all: parser
+all: dead
 
 OBJS = parser.o  \
        codegen.o \
@@ -27,7 +27,7 @@ tokens.cpp: tokens.l parser.hpp
 	g++ -c $(CPPFLAGS) -o $@ $<
 
 
-parser: $(OBJS)
+dead: $(OBJS)
 	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
 

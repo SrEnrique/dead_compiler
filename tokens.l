@@ -17,11 +17,11 @@
 %%
 
 [ \t]					        {col++;}
-[\n]							{line++;
+[\n]							{	line++;
 									col = 0;
 								}
-"inclulle"                      return TOKEN(TEXTERN);
-"regresa"				        return TOKEN(TRETURN);
+"inclulle"                      {return TOKEN(TEXTERN);}
+"regresa"				        {return TOKEN(TRETURN);}
 "variable"						{
 									if (debug)
 										printf("-->Enconte la var \n"); 
@@ -38,18 +38,22 @@
 
 ":"                             {
 									if (debug)
-										printf("-->Enconte los : \n");
+									 	printf("-->Enconte los : \n");
 
 									return TOKEN(TDOSPUNTOS);
 								}
-
-"imprime" 						{
-									return TOKEN(TPRINT);				
+"printer"							{
+									return TOKEN(TPRINT);		
 								}
+
 "inicio"         					return TOKEN(TLBRACE);
 "fin"					          	return TOKEN(TRBRACE);
 
-\".*\"                  	 	{//"
+"if"							{
+									return TOKEN(TIF);
+								}
+
+\"[^\"]*\"                  	 {//"
 									return TOKEN(TSTR); 
 								}
 

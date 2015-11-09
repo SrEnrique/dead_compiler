@@ -43,16 +43,21 @@ GenericValue CodeGenContext::runCode() {
 /* Returns an LLVM type based on the identifier */
 static Type *typeOf(const NIdentifier& type) 
 {
-	if (type.name.compare("int") == 0) {
+	if (type.name.compare("entero") == 0) {
 		return Type::getInt64Ty(getGlobalContext());
 	}
-	else if (type.name.compare("double") == 0) {
+	else if (type.name.compare("doble") == 0) {
 		return Type::getDoubleTy(getGlobalContext());
+	}
+	else if (type.name.compare("cadena") == 0) {
+		// Esto es para hacer las cadenas
+		return  Type::getLabelTy(getGlobalContext());
 	}
 	return Type::getVoidTy(getGlobalContext());
 }
 
 /* -- Code Generation -- */
+/* -- aqui es donde eta la magia*/
 
 Value* NInteger::codeGen(CodeGenContext& context)
 {
@@ -64,6 +69,13 @@ Value* NDouble::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating double: " << value << endl;
 	return ConstantFP::get(Type::getDoubleTy(getGlobalContext()), value);
+}
+
+Value* NString::codeGen(CodeGenContext& context)
+{
+	//En esta parte es para crear las cadenas, amigo estamos cerca de crear las
+	//std::cout << "Creating string: " << value << endl;
+	//return ConstantFP::get(Type::getLabelTy(getGlobalContext()), value);
 }
 
 Value* NIdentifier::codeGen(CodeGenContext& context)
@@ -202,3 +214,4 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 	std::cout << "Creating function: " << id.name << endl;
 	return function;
 }
+

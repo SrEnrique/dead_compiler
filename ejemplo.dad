@@ -1,0 +1,30 @@
+
+inclulle void imprime(a : entero) 
+inclulle void lee(a: entero)
+
+
+
+
+variable a = 10 : entero
+		 b = 12 : entero
+
+variable d = 12.3 : doble
+
+
+funcion func() : entero  inicio
+	variable x = 1 : entero
+	x = x + 10
+	x = 5 * x
+	regresa x 
+fin
+
+funcion sumar(a : entero, b : entero) : entero inicio
+	regresa a + b
+fin
+
+variable c : entero
+c = func()
+variable c1 : entero
+c1 = sumar (1, 1)
+imprime(c)
+imprime(c1)

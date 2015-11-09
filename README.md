@@ -46,7 +46,7 @@ make
 ###Ejemplo 
 ```
 variable a = 10 : int
- 		  b = 12 : int
+ 		 b = 12 : int
 
 funcion func() : int 
 inicio

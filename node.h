@@ -1,6 +1,14 @@
 #include <iostream>
 #include <vector>
 #include <llvm/IR/Value.h>
+#include <string> 
+#include <iostream> 
+#include <sstream>
+#include <stdio.h>
+
+
+
+using namespace std; 
 
 class CodeGenContext;
 class NStatement;
@@ -34,6 +42,13 @@ class NDouble : public NExpression {
 public:
 	double value;
 	NDouble(double value) : value(value) { }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
+class NString : public NExpression {
+public:
+	std::string value;
+	NString(std::string value) : value(value) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
