@@ -3,8 +3,6 @@ inclulle void imprime(a : entero)
 inclulle void lee(a: entero)
 
 
-
-
 variable a = 10 : entero
 		 b = 12 : entero
 
