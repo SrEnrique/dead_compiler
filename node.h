@@ -8,6 +8,12 @@
 
 
 
+
+
+
+
+
+
 using namespace std; 
 
 class CodeGenContext;
@@ -145,3 +151,31 @@ public:
 		type(type), id(id), arguments(arguments), block(block) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
+
+/**/
+class BranchStatement: public NStatement {
+public:
+   	NExpression* testExpression;
+   	NBlock blockTrue;
+    NBlock blockFalse;
+    bool hasFalseBranch;
+    
+    BranchStatement( NExpression* test, NBlock& blockTrue, NBlock blockFalse ) :
+        testExpression( test ), blockTrue( blockTrue ), blockFalse( blockFalse ), hasFalseBranch(true) { }
+
+    BranchStatement( NExpression* test, NBlock& blockTrue ) :
+        testExpression( test ), blockTrue( blockTrue ), hasFalseBranch(false) { }
+
+    string getUniqueName(){
+        char buffer[16];
+        sprintf( buffer, "branch%d", instanceCount );
+        instanceCount += 1;
+        return buffer; 
+    }
+    
+    virtual llvm::Value* codeGen(CodeGenContext& context);
+
+private:
+    static int instanceCount;
+};
+/**/

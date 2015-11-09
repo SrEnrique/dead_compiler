@@ -20,7 +20,7 @@
 [\n]							{	line++;
 									col = 0;
 								}
-"inclulle"                      {return TOKEN(TEXTERN);}
+"externo"                      {return TOKEN(TEXTERN);}
 "regresa"				        {return TOKEN(TRETURN);}
 "variable"						{
 									if (debug)
@@ -42,18 +42,21 @@
 
 									return TOKEN(TDOSPUNTOS);
 								}
-"printer"							{
+
+"printer"						{
 									return TOKEN(TPRINT);		
 								}
 
 "inicio"         					return TOKEN(TLBRACE);
 "fin"					          	return TOKEN(TRBRACE);
 
-"if"							{
+"si"							{
 									return TOKEN(TIF);
 								}
 
-\"[^\"]*\"                  	 {//"
+\".*\"                  		{//"
+									
+
 									return TOKEN(TSTR); 
 								}
 
@@ -62,7 +65,8 @@
 									return TIDENTIFIER;
 								}
 
-								
+\/\/.*?\n 						{/*comentarios*/}
+"/*"[^"*/"]*"*/"				{/*Mas comentarios*/}								
 
 [0-9]+\.[0-9]* 			    	SAVE_TOKEN; return TDOUBLE;
 [0-9]+					        SAVE_TOKEN; return TINTEGER;

@@ -74,8 +74,8 @@ Value* NDouble::codeGen(CodeGenContext& context)
 Value* NString::codeGen(CodeGenContext& context)
 {
 	//En esta parte es para crear las cadenas, amigo estamos cerca de crear las
-	//std::cout << "Creating string: " << value << endl;
-	//return ConstantFP::get(Type::getLabelTy(getGlobalContext()), value);
+	std::cout << "Creating string: " << value << endl;
+	return ConstantFP::get(Type::getLabelTy(getGlobalContext()), value);
 }
 
 Value* NIdentifier::codeGen(CodeGenContext& context)
@@ -214,4 +214,40 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 	std::cout << "Creating function: " << id.name << endl;
 	return function;
 }
+
+
+
+//para el if
+/**/
+Value* BranchStatement::codeGen(CodeGenContext& context)
+{
+    std::cout << "Generating code for if"<< std::endl;
+    IRBuilder<> builder(context.currentBlock());
+    Value* test = testExpression->codeGen( context );
+    
+    BasicBlock *btrue = BasicBlock::Create(getGlobalContext(), "truwe");
+        BasicBlock *bfalse = NULL;
+    if( hasFalseBranch ){
+        bfalse = BasicBlock::Create(getGlobalContext(), "false");
+    }
+
+    builder.CreateCondBr(test, btrue, bfalse);
+
+    context.pushBlock(btrue);
+    blockTrue.codeGen(context);
+    context.popBlock();
+ 
+    if( hasFalseBranch ){   
+        context.pushBlock(bfalse);
+        blockFalse.codeGen(context);
+        context.popBlock();
+    }
+
+    return NULL;
+}
+
+
+
+
+/**/
 

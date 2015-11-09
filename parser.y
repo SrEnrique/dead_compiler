@@ -45,11 +45,11 @@
    calling an (NIdentifier*). It makes the compiler happy.
  */
 %type <ident> ident 
-%type <expr> numeric expr  printf
+%type <expr> numeric expr cadena
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> program stmts block
-%type <stmt> stmt var_decl func_decl extern_decl
+%type <stmt> stmt var_decl func_decl extern_decl if_dec
 %type <token> comparison 
 
 /* Operator precedence for mathematical operators */
@@ -70,10 +70,15 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
 
 stmt : TVAR var_decl {$$ = $2;}
 	 | TFUN func_decl {$$ = $2;}
+	 | if_dec {$$ = $1;}
 	 | var_decl | func_decl | extern_decl
 	 | expr { $$ = new NExpressionStatement(*$1); }
 	 | TRETURN expr { $$ = new NReturnStatement(*$2); }
      ;
+
+if_dec 	: TIF TLPAREN expr TRPAREN block { $$ = new BranchStatement( $3, *$5 ); }
+		;
+
 
 block : TLBRACE stmts TRBRACE { $$ = $2; }
 	  | TLBRACE TRBRACE { $$ = new NBlock(); }
@@ -121,7 +126,7 @@ expr : ident TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
 	 | ident TLPAREN call_args TRPAREN { $$ = new NMethodCall(*$1, *$3); delete $3; }
 	 | ident { $<ident>$ = $1; }
 	 | numeric
-	 
+	 | cadena
      | expr TMUL expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
      | expr TDIV expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
      | expr TPLUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
@@ -129,6 +134,11 @@ expr : ident TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
  	 | expr comparison expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
      | TLPAREN expr TRPAREN { $$ = $2; }
 	 ;
+cadena 	: TSTR 	{ 
+					printf("%s\n", yytext );
+					$$ = new NString(yytext); delete $1; 
+				}
+		;
 	
 call_args : /*blank*/  { $$ = new ExpressionList(); }
 		  | expr { $$ = new ExpressionList(); $$->push_back($1); }
