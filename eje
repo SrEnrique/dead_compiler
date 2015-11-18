@@ -16,9 +16,80 @@ entry:
   store i64 10, i64* %a
   %b = alloca i64
   store i64 12, i64* %b
-  %0 = load i64* %a
-  call void @echo(i64 %0)
-  %1 = load i64* %b
-  call void @echo(i64 %1)
+  %d = alloca double
+  store double 1.230000e+01, double* %d
+  %c = alloca i64
+  %0 = call i64 @func()
+  store i64 %0, i64* %c
+  %c1 = alloca i64
+  %1 = call i64 @sumar(i64 1, i64 1)
+  store i64 %1, i64* %c1
+  %2 = load i64* %c
+  call void @echo(i64 %2)
+  %3 = load i64* %c1
+  call void @echo(i64 %3)
+  %4 = call i64 @mul(i64 2, i64 2)
+  call void @echo(i64 %4)
+  %5 = call i64 @div(i64 2, i64 2)
+  call void @echo(i64 %5)
   ret void
+}
+
+declare void @imprime(i64)
+
+declare void @lee(i64)
+
+define internal i64 @func() {
+entry:
+  %x = alloca i64
+  store i64 1, i64* %x
+  %0 = load i64* %x
+  %1 = add i64 %0, 10
+  store i64 %1, i64* %x
+  %2 = load i64* %x
+  %3 = mul i64 5, %2
+  store i64 %3, i64* %x
+  %4 = load i64* %x
+  ret i64 %4
+}
+
+define internal i64 @sumar(i64 %a1, i64 %b2) {
+entry:
+  %a = alloca i64
+  store i64 %a1, i64* %a
+  %b = alloca i64
+  store i64 %b2, i64* %b
+  %0 = load i64* %b
+  %1 = load i64* %a
+  %2 = add i64 %1, %0
+  ret i64 %2
+}
+
+define internal i64 @mul(i64 %a1, i64 %b2) {
+entry:
+  %a = alloca i64
+  store i64 %a1, i64* %a
+  %b = alloca i64
+  store i64 %b2, i64* %b
+  %c = alloca i64
+  %0 = call i64 @sumar(i64 1, i64 1)
+  store i64 %0, i64* %c
+  %1 = load i64* %c
+  %2 = load i64* %b
+  %3 = load i64* %a
+  %4 = mul i64 %3, %2
+  %5 = add i64 %4, %1
+  ret i64 %5
+}
+
+define internal i64 @div(i64 %a1, i64 %b2) {
+entry:
+  %a = alloca i64
+  store i64 %a1, i64* %a
+  %b = alloca i64
+  store i64 %b2, i64* %b
+  %0 = load i64* %b
+  %1 = load i64* %a
+  %2 = sdiv i64 %1, %0
+  ret i64 %2
 }

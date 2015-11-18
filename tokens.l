@@ -53,6 +53,7 @@
 "si"							{
 									return TOKEN(TIF);
 								}
+"sino"							{ return TOKEN(TELSE);} 
 
 \".*\"                  		{//"
 									

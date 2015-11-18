@@ -3,6 +3,8 @@
 #include "parser.hpp"
 
 using namespace std;
+//int PrintfMethodCall::instanceCount = 0;
+int BranchStatement::instanceCount = 0;
 
 /* Compile the AST into a module */
 void CodeGenContext::generateCode(NBlock& root)
@@ -57,7 +59,7 @@ static Type *typeOf(const NIdentifier& type)
 }
 
 /* -- Code Generation -- */
-/* -- aqui es donde eta la magia*/
+/* -- aqui es donde esta la magia*/
 
 Value* NInteger::codeGen(CodeGenContext& context)
 {
@@ -109,18 +111,31 @@ Value* NBinaryOperator::codeGen(CodeGenContext& context)
 	std::cout << "Creating binary operation " << op << endl;
 	Instruction::BinaryOps instr;
 	switch (op) {
-		case TPLUS: 	instr = Instruction::Add; goto math;
-		case TMINUS: 	instr = Instruction::Sub; goto math;
-		case TMUL: 		instr = Instruction::Mul; goto math;
-		case TDIV: 		instr = Instruction::SDiv; goto math;
-				
-		/* TODO comparison */
+		case TPLUS:    return BinaryOperator::Create( Instruction::Add,
+    	        lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    	case TMINUS:   return BinaryOperator::Create( Instruction::Sub,
+    	        lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    	case TMUL:     return BinaryOperator::Create( Instruction::Mul,
+    	        lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    	case TDIV:     return BinaryOperator::Create( Instruction::SDiv,
+    	        lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+		// Logical Operations
+    	case TCEQ:  return  CmpInst::Create( Instruction::ICmp, CmpInst::ICMP_EQ,
+    	        lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    	case TCNE:  return  CmpInst::Create( Instruction::ICmp, CmpInst::ICMP_NE,
+    	        lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    	case TCLT:  return  CmpInst::Create( Instruction::ICmp, CmpInst::ICMP_SLT,
+    	        lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    	case TCGT:  return  CmpInst::Create( Instruction::ICmp, CmpInst::ICMP_SGT,
+    	        lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    	case TCLE:  return  CmpInst::Create( Instruction::ICmp, CmpInst::ICMP_SLE,
+    	        lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
+    	case TCGE:  return  CmpInst::Create( Instruction::ICmp, CmpInst::ICMP_SGE,
+    	        lhs.codeGen(context), rhs.codeGen(context), "", context.currentBlock());
 	}
 
 	return NULL;
-math:
-	return BinaryOperator::Create(instr, lhs.codeGen(context), 
-		rhs.codeGen(context), "", context.currentBlock());
+
 }
 
 Value* NAssignment::codeGen(CodeGenContext& context)
@@ -179,6 +194,8 @@ Value* NExternDeclaration::codeGen(CodeGenContext& context)
         argTypes.push_back(typeOf((**it).type));
     }
     FunctionType *ftype = FunctionType::get(typeOf(type), makeArrayRef(argTypes), false);
+    
+    
     Function *function = Function::Create(ftype, GlobalValue::ExternalLinkage, id.name.c_str(), context.module);
     return function;
 }
@@ -195,7 +212,7 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", function, 0);
 
 	context.pushBlock(bblock);
-
+	context.currentFunction = function;
 	Function::arg_iterator argsValues = function->arg_begin();
     Value* argumentValue;
 
@@ -212,23 +229,38 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 
 	context.popBlock();
 	std::cout << "Creating function: " << id.name << endl;
+	context.currentFunction = context.mainFunction;
 	return function;
 }
 
+/*======================================================================================================
+|||||||||||||||||||||||||||||   	  |||||| 	      ||||||||||||||||||||||||||||||||||||||||||||||||
+||||||||||||||||||||||||||||||| 	|||||||| 	||||||||||||||||||||||||||||||||||||||||||||||||||||||
+||||||||||||||||||||||||||||||| 	|||||||| 	||||||||||||||||||||||||||||||||||||||||||||||||||||||
+||||||||||||||||||||||||||||||| 	|||||||| 	     |||||||||||||||||||||||||||||||||||||||||||||||||
+||||||||||||||||||||||||||||||| 	|||||||| 	||||||||||||||||||||||||||||||||||||||||||||||||||||||
+||||||||||||||||||||||||||||||| 	|||||||| 	||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|||||||||||||||||||||||||||||   	  |||||| 	||||||||||||||||||||||||||||||||||||||||||||||||||||||
+====================================================================================================*/
 
 
-//para el if
-/**/
-Value* BranchStatement::codeGen(CodeGenContext& context)
+Value *BranchStatement::codeGen(CodeGenContext& context)
 {
-    std::cout << "Generating code for if"<< std::endl;
+    cout<< "Generating code for if sen" << std::endl;
+
     IRBuilder<> builder(context.currentBlock());
     Value* test = testExpression->codeGen( context );
     
-    BasicBlock *btrue = BasicBlock::Create(getGlobalContext(), "truwe");
-        BasicBlock *bfalse = NULL;
+    Function *TheFunction = builder.GetInsertBlock()->getParent();
+
+  
+  
+    BasicBlock *btrue = BasicBlock::Create(getGlobalContext(), getUniqueName(), TheFunction);
+    BasicBlock *bfalse = NULL;
+    
     if( hasFalseBranch ){
-        bfalse = BasicBlock::Create(getGlobalContext(), "false");
+    	cout<<"------->Tiene else";
+        bfalse = BasicBlock::Create(getGlobalContext(), getUniqueName(), TheFunction);
     }
 
     builder.CreateCondBr(test, btrue, bfalse);
@@ -242,11 +274,60 @@ Value* BranchStatement::codeGen(CodeGenContext& context)
         blockFalse.codeGen(context);
         context.popBlock();
     }
-
     return NULL;
+
+    
+
+//    Value *CondV = testExpression->codeGen(context);
+//    IRBuilder<> Builder(context.currentBlock());
+//
+//    if (!CondV) return nullptr;
+//    
+//
+//	Function *TheFunction = Builder.GetInsertBlock()->getParent();
+//
+//	BasicBlock *ThenBB =
+//    BasicBlock::Create(getGlobalContext(), "then", TheFunction);
+//	BasicBlock *ElseBB = BasicBlock::Create(getGlobalContext(), "else");
+//	BasicBlock *MergeBB = BasicBlock::Create(getGlobalContext(), "ifcont");
+//	
+//	Builder.CreateCondBr(CondV, ThenBB, ElseBB);
+//
+//
+//
+//	// Emit then value.
+//	Builder.SetInsertPoint(ThenBB);
+//	
+//	Value *ThenV = blockTrue.codeGen(context);
+//	if (!ThenV)
+//	  return nullptr;
+//	
+//	Builder.CreateBr(MergeBB);
+//	// Codegen of 'Then' can change the current block, update ThenBB for the PHI.
+//	ThenBB = Builder.GetInsertBlock();
+//	// Emit else block.
+//	TheFunction->getBasicBlockList().push_back(ElseBB);
+//	Builder.SetInsertPoint(ElseBB);
+//	
+//	Value *ElseV = blockFalse.codeGen(context);
+//	if (!ElseV)
+//	  return nullptr;
+//	
+//	Builder.CreateBr(MergeBB);
+//	// codegen of 'Else' can change the current block, update ElseBB for the PHI.
+//	ElseBB = Builder.GetInsertBlock();
+//	// Emit merge block.
+//	TheFunction->getBasicBlockList().push_back(MergeBB);
+//	Builder.SetInsertPoint(MergeBB);
+//	PHINode *PN =
+//	   Builder.CreatePHI(Type::getDoubleTy(getGlobalContext()), 2, "iftmp");
+//
+// 	PN->addIncoming(ThenV, ThenBB);
+//	PN->addIncoming(ElseV, ElseBB);
+//
+//	return PN;
+
 }
-
-
 
 
 /**/

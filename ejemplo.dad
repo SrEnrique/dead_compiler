@@ -7,7 +7,7 @@ variable a = 10 : entero
 		 b = 12 : entero
 
 variable d = 12.3 : doble
-variable cade : cadena
+//variable cade : cadena
 //cade = "Hola"
 
 
@@ -29,11 +29,12 @@ variable c : entero
 c = func()
 variable c1 : entero
 c1 = sumar (1, 1)
-imprime(c)
-imprime(c1)
+echo(c)
+echo(c1)
 
 funcion mul(a : entero, b : entero) : entero inicio
-	regresa a * b
+	variable c = sumar(1,1) : entero
+	regresa a * b + c
 fin
 /*
 	Adios
@@ -42,8 +43,11 @@ funcion div(a : entero, b : entero) : entero inicio
 	regresa a / b
 fin
 
-imprime(mul(2, 2))
-imprime(div(2, 2))
+
+
+
+echo(mul(2, 2))
+echo(div(2, 2))
 
 
 

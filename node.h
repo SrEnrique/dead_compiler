@@ -152,30 +152,34 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-/**/
 class BranchStatement: public NStatement {
 public:
-   	NExpression* testExpression;
-   	NBlock blockTrue;
+    NExpression* testExpression;
+    NBlock blockTrue;
     NBlock blockFalse;
     bool hasFalseBranch;
-    
-    BranchStatement( NExpression* test, NBlock& blockTrue, NBlock blockFalse ) :
-        testExpression( test ), blockTrue( blockTrue ), blockFalse( blockFalse ), hasFalseBranch(true) { }
 
-    BranchStatement( NExpression* test, NBlock& blockTrue ) :
-        testExpression( test ), blockTrue( blockTrue ), hasFalseBranch(false) { }
-
-    string getUniqueName(){
+    std::string getUniqueName(){
         char buffer[16];
-        sprintf( buffer, "branch%d", instanceCount );
+        sprintf( buffer, "lblif_%d", instanceCount );
         instanceCount += 1;
         return buffer; 
     }
+    BranchStatement( NExpression* test, NBlock& blockTrue, NBlock blockFalse ) :
+        testExpression( test ), 
+        blockTrue( blockTrue ), 
+        blockFalse( blockFalse ), 
+        hasFalseBranch(true) { }
+
+    BranchStatement( NExpression* test, NBlock& blockTrue ) :
+        testExpression( test ), 
+        blockTrue( blockTrue ), 
+        hasFalseBranch(false) { }
+
+    
     
     virtual llvm::Value* codeGen(CodeGenContext& context);
 
 private:
     static int instanceCount;
 };
-/**/

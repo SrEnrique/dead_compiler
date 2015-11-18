@@ -1,0 +1,76 @@
+; ; ModuleID = 'main'
+; 
+; @.str = private constant [4 x i8] c"%d\0A\00"
+; 
+; declare i32 @printf(i8*, ...)
+; 
+; define internal void @echo(i64 %toPrint) {
+; entry:
+  ;%0 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @.str, i32 0, i32 0 ), i64 %toPrint)
+;   ret void
+; }
+; 
+; define internal void @main() {
+; entry:
+;   %b = alloca i64
+;   store i64 2, i64* %b
+;   %c = alloca i64
+;   store i64 1, i64* %c
+;   %a = alloca i64
+;   store i64 1, i64* %a
+;   %0 = load i64* %b
+;   %1 = load i64* %c
+;   %2 = icmp sgt i64 %0, %1
+;   br i1 %2, label %lblif_0, label %lblif_1
+;   %3 = load i64* %a
+;   call void @echo(i64 %3)
+;   ret void
+; 
+; lblif_0:                                          ; preds = %entry
+;   %z = alloca i64
+;   store i64 2, i64* %z
+; 
+; lblif_1:                                          ; preds = %entry
+;   %x = alloca i64
+;   store i64 2, i64* %x
+; }
+
+
+
+; ModuleID = 'main'
+
+@.str = private constant [4 x i8] c"%d\0A\00"
+
+declare i32 @printf(i8*, ...)
+
+define internal void @echo(i64 %toPrint) {
+entry:
+  %0 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @.str, i32 0, i32 0), i64 %toPrint)
+  ret void
+}
+
+define internal void @main() {
+entry:
+  %b = alloca i64
+  store i64 2, i64* %b
+  %c = alloca i64
+  store i64 1, i64* %c
+  %a = alloca i64
+  store i64 1, i64* %a
+  %0 = load i64* %b
+  %1 = load i64* %c
+  %2 = add i64 %1, 1
+  %3 = icmp sgt i64 %0, %2
+  br i1 %3, label %lblif_0, label %lblif_1
+  %4 = load i64* %a
+  call void @echo(i64 %4)
+  ret void
+
+lblif_0:                                          ; preds = %entry
+  %z = alloca i64
+  store i64 2, i64* %z
+
+lblif_1:                                          ; preds = %entry
+  %x = alloca i64
+  store i64 2, i64* %x
+}

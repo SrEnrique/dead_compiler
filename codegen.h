@@ -29,10 +29,15 @@ public:
 
 class CodeGenContext {
     std::stack<CodeGenBlock *> blocks;
-    Function *mainFunction;
+
 
 public:
+    Function *mainFunction;
     Module *module;
+    Function *printfFunction;
+    Function *currentFunction;
+    
+    
     CodeGenContext() { module = new Module("main", getGlobalContext()); }
     
     void generateCode(NBlock& root);

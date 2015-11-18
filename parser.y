@@ -37,8 +37,7 @@
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL  
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
 %token <token> TPLUS TMINUS TMUL TDIV
-%token <token> TRETURN TEXTERN TVAR TDOSPUNTOS TPRINT TFUN  TIF 
-
+%token <token> TRETURN TEXTERN TVAR TDOSPUNTOS TPRINT TFUN  TIF TELSE
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
    we call an ident (defined by union type ident) we are really
@@ -49,7 +48,7 @@
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> program stmts block
-%type <stmt> stmt var_decl func_decl extern_decl if_dec
+%type <stmt> stmt var_decl func_decl extern_decl if_dec if_dec2
 %type <token> comparison 
 
 /* Operator precedence for mathematical operators */
@@ -71,13 +70,13 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
 stmt : TVAR var_decl {$$ = $2;}
 	 | TFUN func_decl {$$ = $2;}
 	 | if_dec {$$ = $1;}
+	 | if_dec2 {$$ = $1;}
 	 | var_decl | func_decl | extern_decl
 	 | expr { $$ = new NExpressionStatement(*$1); }
 	 | TRETURN expr { $$ = new NReturnStatement(*$2); }
      ;
 
-if_dec 	: TIF TLPAREN expr TRPAREN block { $$ = new BranchStatement( $3, *$5 ); }
-		;
+
 
 
 block : TLBRACE stmts TRBRACE { $$ = $2; }
@@ -101,6 +100,19 @@ func_decl :  ident TLPAREN func_decl_args TRPAREN TDOSPUNTOS ident block
 				$$ = new NFunctionDeclaration(*$6, *$1, *$3, *$7); delete $3; 
 			}
 		  ;
+
+if_dec 	: TIF TLPAREN expr TRPAREN block { 
+				/*$$ = new BranchStatement( $3, *$5 );*/ 
+				if (debug)
+					printf("------>Encontre los if - pero no se hacer nada\n");
+				$$ = new BranchStatement( $3, *$5 );
+			}
+		;
+if_dec2 : TIF TLPAREN expr TRPAREN block TELSE block { 
+				if (debug)
+					printf("----->Encontre los el else - pero no se hacer nada\n");
+				$$ = new BranchStatement( $3, *$5, *$7 );}
+		;
 
 	
 func_decl_args : /*blank*/  { $$ = new VariableList(); }
