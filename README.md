@@ -10,6 +10,7 @@ Compilador con Flex, Bison y llvm
   bison 
   llvm 
   make
+  clang++-3.5
 ```
 Antes de compilar es necesario verificar que tenemos instalados los paquetes anteriormente mencionados , si no instálalos.
 ##Instalar flex, bison y llvm
@@ -34,7 +35,7 @@ sudo ln -s /usr/include/llvm-c-3.5/llvm-c /usr/include/llvm-c
 Una vez instalado llvm continuamos instalando flex y bison 
 ###Instalar felx y bison
 ```
-sudo apt-get install flex bison
+sudo apt-get install flex bison clang++-3.5
 ```
 
 ###build
@@ -62,7 +63,9 @@ fin
  echo(c)
 ```
 
-
+Si tienes un error de `/usr/bin/ld`
 solucion
-sudo apt-get install lib32z1-dev
+```
+sudo apt-get install lib32z1-dev &&
 sudo apt-get install libncurses5-dev
+```
