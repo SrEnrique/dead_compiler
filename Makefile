@@ -24,10 +24,10 @@ tokens.cpp: tokens.l parser.hpp
 	flex -o $@ $^
 
 %.o: %.cpp
-	clang++-3.7 -c $(CPPFLAGS) -o $@ $<
+	clang++-3.5 -c $(CPPFLAGS) -o $@ $<
 
 
 dead: $(OBJS)
-	clang++-3.7 -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
+	clang++-3.5 -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
 
