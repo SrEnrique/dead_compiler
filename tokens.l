@@ -24,21 +24,31 @@
 "regresa"				        {return TOKEN(TRETURN);}
 "variable"						{
 									if (debug)
-										printf("-->Enconte la var \n"); 
+										printf(";-->Enconte la var \n"); 
 									
 									return TOKEN(TVAR);
 								}
 "funcion"						{
 									if (debug)
-										printf("-->Enconte la var \n"); 
+										printf(";-->Enconte la var \n"); 
 									
 									return TOKEN(TFUN);
+								}
+
+"casos"							{
+									return TOKEN(TCASOS);
+
+								}
+
+"caso"							{
+									return TOKEN(TCASO);
+
 								}
 
 
 ":"                             {
 									if (debug)
-									 	printf("-->Enconte los : \n");
+									 	printf(";-->Enconte los : \n");
 
 									return TOKEN(TDOSPUNTOS);
 								}
@@ -55,6 +65,9 @@
 								}
 "sino"							{ return TOKEN(TELSE);} 
 
+"para"							{ return TOKEN(TFOR);}
+"mientras"						{return TOKEN(TWIL);}
+
 \".*\"                  		{//"
 									
 
@@ -66,8 +79,16 @@
 									return TIDENTIFIER;
 								}
 
-\/\/.*?\n 						{/*comentarios*/}
-"/*"[^"*/"]*"*/"				{/*Mas comentarios*/}								
+\/\/.*?\n 						{
+									line++;
+									col = 0;
+									/*comentarios*/
+								}
+"/*"[^"*/"]*"*/"				{
+									line++;
+									col = 0;
+									/*Mas comentarios*/
+								}								
 
 [0-9]+\.[0-9]* 			    	SAVE_TOKEN; return TDOUBLE;
 [0-9]+					        SAVE_TOKEN; return TINTEGER;

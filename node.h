@@ -161,7 +161,7 @@ public:
 
     std::string getUniqueName(){
         char buffer[16];
-        sprintf( buffer, "lblif_%d", instanceCount );
+        sprintf( buffer, "lab%d", instanceCount );
         instanceCount += 1;
         return buffer; 
     }
@@ -175,6 +175,60 @@ public:
         testExpression( test ), 
         blockTrue( blockTrue ), 
         hasFalseBranch(false) { }
+
+    
+    
+    virtual llvm::Value* codeGen(CodeGenContext& context);
+
+private:
+    static int instanceCount;
+};
+
+class ForStatement: public NStatement {
+public:
+	
+    NExpression* Start;
+    NExpression* End;
+    NExpression* Step;
+    NBlock Body;
+   
+
+    std::string getUniqueName(){
+        char buffer[16];
+        sprintf( buffer, "lab%d", instanceCount );
+        instanceCount += 1;
+        return buffer; 
+    }
+    ForStatement( NExpression* Start, NExpression* End, NExpression* Step, NBlock& Body ) :
+        Start( Start ), 
+        End( End ), 
+        Step( Step ), 
+        Body(Body) { }
+
+    
+    
+    virtual llvm::Value* codeGen(CodeGenContext& context);
+
+private:
+    static int instanceCount;
+};
+
+class WhileStatement: public NStatement {
+public:
+	
+    NExpression* Start;
+    NBlock Body;
+   
+
+    std::string getUniqueName(){
+        char buffer[16];
+        sprintf( buffer, "lab%d", instanceCount );
+        instanceCount += 1;
+        return buffer; 
+    }
+    WhileStatement( NExpression* Start, NBlock& Body ) :
+        Start( Start ), 
+        Body(Body) { }
 
     
     

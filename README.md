@@ -63,3 +63,6 @@ fin
 ```
 
 
+solucion
+sudo apt-get install lib32z1-dev
+sudo apt-get install libncurses5-dev

@@ -37,7 +37,7 @@
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL  
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
 %token <token> TPLUS TMINUS TMUL TDIV
-%token <token> TRETURN TEXTERN TVAR TDOSPUNTOS TPRINT TFUN  TIF TELSE
+%token <token> TRETURN TEXTERN TVAR TDOSPUNTOS TPRINT TFUN  TIF TELSE TFOR TWIL TCASOS TCASO
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
    we call an ident (defined by union type ident) we are really
@@ -48,7 +48,7 @@
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> program stmts block
-%type <stmt> stmt var_decl func_decl extern_decl if_dec if_dec2
+%type <stmt> stmt var_decl func_decl extern_decl if_dec if_dec2 for_dec wil_dec block_case dec_case
 %type <token> comparison 
 
 /* Operator precedence for mathematical operators */
@@ -71,6 +71,9 @@ stmt : TVAR var_decl {$$ = $2;}
 	 | TFUN func_decl {$$ = $2;}
 	 | if_dec {$$ = $1;}
 	 | if_dec2 {$$ = $1;}
+	 | for_dec {$$ = $1;}
+	 | dec_case {$$ = $1;}
+	 | wil_dec {$$= $1;}
 	 | var_decl | func_decl | extern_decl
 	 | expr { $$ = new NExpressionStatement(*$1); }
 	 | TRETURN expr { $$ = new NReturnStatement(*$2); }
@@ -104,13 +107,13 @@ func_decl :  ident TLPAREN func_decl_args TRPAREN TDOSPUNTOS ident block
 if_dec 	: TIF TLPAREN expr TRPAREN block { 
 				/*$$ = new BranchStatement( $3, *$5 );*/ 
 				if (debug)
-					printf("------>Encontre los if - pero no se hacer nada\n");
+					printf(";------>Encontre los if - pero no se hacer nada\n");
 				$$ = new BranchStatement( $3, *$5 );
 			}
 		;
 if_dec2 : TIF TLPAREN expr TRPAREN block TELSE block { 
 				if (debug)
-					printf("----->Encontre los el else - pero no se hacer nada\n");
+					printf(";----->Encontre los el else - pero no se hacer nada\n");
 				$$ = new BranchStatement( $3, *$5, *$7 );}
 		;
 
@@ -147,7 +150,7 @@ expr : ident TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
      | TLPAREN expr TRPAREN { $$ = $2; }
 	 ;
 cadena 	: TSTR 	{ 
-					printf("%s\n", yytext );
+					printf(";%s\n", yytext );
 					$$ = new NString(yytext); delete $1; 
 				}
 		;
@@ -156,6 +159,35 @@ call_args : /*blank*/  { $$ = new ExpressionList(); }
 		  | expr { $$ = new ExpressionList(); $$->push_back($1); }
 		  | call_args TCOMMA expr  { $1->push_back($3); }
 		  ;
+//		   1  |   2   |  3  |  4   | 5  |  6   | 6  |  7    | 8
+for_dec : TFOR TLPAREN expr TCOMMA expr TCOMMA expr TRPAREN block
+			{ 
+				if(debug) printf(";--------> :D \n");
+				//inicio, end paso block
+				$$ = new ForStatement( $3, $5, $7, *$9 ); 
+
+			}
+		;
+
+wil_dec : TWIL TLPAREN expr TRPAREN block
+			{
+				$$ = new WhileStatement($3, *$5);  
+			}
+;
+
+dec_case : TCASOS TLPAREN  expr TRPAREN TLBRACE block_case TRBRACE
+			{
+				printf(";Siii tonto\n");
+			}
+		;
+
+
+block_case : TCASO TDOSPUNTOS expr block
+			{
+				printf(";Siii tonto bloque\n");
+			}
+			| block_case 
+			;
 
 
 comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE;

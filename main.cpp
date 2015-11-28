@@ -12,7 +12,7 @@ void createCoreFunctions(CodeGenContext& context);
 int main(int argc, char **argv)
 {
 	yyparse();
-	cout << programBlock << endl;
+	cout <<";"<< programBlock << endl;
 	InitializeNativeTarget();
 	CodeGenContext context;
 	createCoreFunctions(context);
