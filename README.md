@@ -46,24 +46,24 @@ make
 
 ###Ejemplo 
 ```
-variable a = 10 : int
- 		 b = 12 : int
+variable a = 10 : entero
+ 		 b = 12 : entero
 
 funcion func() : int 
 inicio
-	variable x = 14 : int
+	variable x = 14 : entero
 	regresa x 
 fin
 
 
  echo(a)
  echo(b)
- variable c : int
+ variable c : entero
  c = func()
  echo(c)
 ```
 
-Si tienes un error de `/usr/bin/ld`
+Si 
 solucion
 ```
 sudo apt-get install lib32z1-dev &&
